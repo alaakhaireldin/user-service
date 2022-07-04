@@ -1,11 +1,12 @@
 service: our-todo-app
-frameworkVersion: '2'
+frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: python3.8
+  region: eu-north-1
   environment:
-    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+    USERS_TABLE: usersTable
   httpApi:
     cors: true
   iam:
@@ -13,32 +14,43 @@ provider:
       statements:
         - Effect: Allow
           Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-
-resources:
-  Resources:
-    TodosDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+            - dynamodb:*
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.USERS_TABLE}"
         
 plugins:
   - serverless-python-requirements
   - serverless-dynamodb-local
   - serverless-offline
+
+functions:
+  create_user:
+    handler: api/create_user.handler
+    events:
+      - httpApi:  
+          method: post
+          path: /user
+
+custom:
+   dynamodb:
+      start:
+        inMemory: true
+        migrate: true
+        sharedDb: true
+      stages:
+         - dev
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.USERS_TABLE}
