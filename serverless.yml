@@ -29,6 +29,12 @@ functions:
       - httpApi:  
           method: post
           path: /user
+  get_user:
+    handler: api/get_user.handler
+    events:
+      - httpApi:
+          method: get
+          path: /getUser/{user_id}
 
 custom:
    dynamodb:
