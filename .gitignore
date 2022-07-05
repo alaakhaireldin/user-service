@@ -4,3 +4,4 @@ __pycache__/
 .serverless
 Pipfile
 .dynamodb
+Pipfile.lock
