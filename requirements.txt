@@ -3,3 +3,7 @@ boto3==1.24.22
 Flask==2.1.2
 setuptools==51.1.2
 simplejson==3.17.6
+-i https://pypi.org/simple
+pytest-mock==1.10.3
+pytest-watch==4.2.0
+pytest==4.4.0
