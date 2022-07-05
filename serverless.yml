@@ -34,7 +34,7 @@ functions:
     events:
       - httpApi:
           method: get
-          path: /getUser/{user_id}
+          path: /user/{user_id}
 
 custom:
    dynamodb:
